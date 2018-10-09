@@ -1,34 +1,17 @@
+require "json"
 require "faraday"
 
 require_relative "secrets"
+require_relative "trello_client"
 
-
-response = Faraday.get("https://api.trello.com/1/boards/LFZoaH46/cards")
-
-require "json"
-
-cards = JSON.parse (response.body)
-
-infos = []
-
-cards.each do |cards_hash|
-  card_name = cards_hash["name"]
-  short_link = cards_hash["id"]
-  infos += [short_link + " : " + card_name]
-end
+trello_client = TrelloClient.new
 
 if ARGV[0] == "list"
- 	puts infos
-
+	puts trello_client.list
 elsif ARGV[0] == "create"
-	puts "new card created"
-	response = Faraday.post("https://api.trello.com/1/cards?", {"name" => ARGV[1], "desc" => ARGV[2], "idList" => "5bb39ee0029f335fb88aa2a9", "key" => API_KEY, "token" => API_TOKEN})
-
+	puts trello_client.create(ARGV[1], ARGV[2])
 elsif ARGV[0] == "delete"
-	response = Faraday.delete("https://api.trello.com/1/cards/" + ARGV[1], {"key" => API_KEY, "token" => API_TOKEN})
-	puts "Card " + ARGV[1] + " deleted"
-
+    puts trello_client.delete(ARGV[1])
 else 
 	puts "error"
-
 end
