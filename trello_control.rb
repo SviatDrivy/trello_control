@@ -1,5 +1,8 @@
 require "faraday"
 
+require_relative "secrets"
+
+
 response = Faraday.get("https://api.trello.com/1/boards/LFZoaH46/cards")
 
 require "json"
@@ -16,10 +19,16 @@ end
 
 if ARGV[0] == "list"
  	puts infos
+
 elsif ARGV[0] == "create"
 	puts "new card created"
-	require_relative "secrets"
 	response = Faraday.post("https://api.trello.com/1/cards?", {"name" => ARGV[1], "desc" => ARGV[2], "idList" => "5bb39ee0029f335fb88aa2a9", "key" => API_KEY, "token" => API_TOKEN})
+
+elsif ARGV[0] == "delete"
+	response = Faraday.delete("https://api.trello.com/1/cards/" + ARGV[1], {"key" => API_KEY, "token" => API_TOKEN})
+	puts "Card " + ARGV[1] + " deleted"
+
 else 
 	puts "error"
+
 end
